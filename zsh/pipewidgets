@@ -1,0 +1,9 @@
+# This depends on a zle widget by Max Mikhanosha which he posted to zsh-users
+# Get it at http://www.zsh.org/mla/users/2008/msg00708.html
+
+# Define some widgets
+# C-g for grep, C-f for less
+define-pipe-widget insert_grep  "grep \"@@@\"" "grep -i \"@@@\"" "grep @@@"
+define-pipe-widget insert_less "less @@@" "less\n"
+bindkey "\C-g" insert_grep
+bindkey "\C-f" insert_less

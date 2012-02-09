@@ -1,0 +1,40 @@
+SMAPIPATH=/sys/devices/platform/smapi/BAT0
+alias pn="cat $SMAPIPATH/power_now"
+# If not already in your zshrc, you need to uncomment the following two lines for this to work (iirc)
+#autoload -U promptinit; promptinit
+#setopt promptsubst
+RPROMPT=$RPROMPT'[$(pu s)$(perc s)$(trem)]'
+trem() {
+	if [[ ( ! -d $SMAPIPATH ) || ( ! -f $SMAPIPATH/installed) || ( ! `cat $SMAPIPATH/installed` == '1' ) ]]; then
+                return;
+        fi
+	if [[ `cat $SMAPIPATH/state` == 'discharging' ]]; then	
+		printf "%.1fh\n" $((`cat $SMAPIPATH/remaining_running_time`/60.0))
+	else
+		printf "%dmin\n" $((`cat $SMAPIPATH/remaining_charging_time`*1.0))
+	fi
+}
+
+perc() {
+	if [[ ( ! -d $SMAPIPATH ) || ( ! -f $SMAPIPATH/installed) || ( ! `cat $SMAPIPATH/installed` == '1' ) ]]; then
+		echo "AC"
+		return;
+        fi
+	printf " %s%%\n" `cat $SMAPIPATH/remaining_percent`
+	if [[ $1 == 's' ]]; then
+		echo "%% ";
+	fi
+}
+
+pu() {
+	if [[ ( ! -d $SMAPIPATH ) || ( ! -f $SMAPIPATH/installed) || ( ! `cat $SMAPIPATH/installed` == '1' ) ]]; then
+                return;
+        fi
+	if [[ `cat $SMAPIPATH/state` != 'discharging' ]]; then
+		SMAPIPOWERFACTOR=-1
+	else
+		SMAPIPOWERFACTOR=1
+	fi
+	printf "%.1fW\n" $((`cat $SMAPIPATH/power_avg`/(-1000.0*$SMAPIPOWERFACTOR)))
+	unset SMAPIPOWERFACTOR
+}

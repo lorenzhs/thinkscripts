@@ -1,0 +1,35 @@
+#!/bin/zsh
+# This script analyzes a debian package's description, extracts its build dependencies and
+# creates an otherwise empty package that depends on these packages in your current working
+# directory. You will have to install it manually (you will probably get lots of broken
+# dependencies since the dependencies are missing, open up aptitude and fix those manually;
+# I have yet to find an easy way to install a local package and its dependencies)
+# Anyay, like this, clean removal of build-dependencies is easy-peasy.
+
+if [[ -z $1 ]]; then echo "Usage: builddep <package name> [<package display name>]"; return 1; fi
+
+PKG=$1
+if [[ ! -z $2 ]]; then PKGN=$2; else PKGN=$1; fi
+DEPS=$(apt-cache showsrc $1 | /bin/grep "Build-Depends" | head -n 1 | sed 's/^Build-//' | sed 's/ \[[^\]*\]//')
+FILENAME=$PKG-deps.deb
+
+CONTROL="Package: $PKG-deps
+Version: 1.0
+Section: devel
+Priority: optional
+Architecture: all
+Essential: no
+$DEPS
+Installed-Size: 0
+Maintainer: Your Name <foo@bar.baz>
+Description: This package pulls in all the dependencies for $PKGN. It does not do anything else."
+
+TMPDIR=$(mktemp -d)
+CDIR=$(pwd)
+pushd $TMPDIR
+mkdir -p pkg/DEBIAN
+echo $CONTROL > pkg/DEBIAN/control
+dpkg -b pkg $FILENAME
+mv $FILENAME $CDIR
+popd
+#rm -r $TMPDIR

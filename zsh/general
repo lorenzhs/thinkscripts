@@ -1,0 +1,30 @@
+# Reload a kernel module safely, optionally passing parameters
+# Useful to enable fan control.
+reloadmod() {
+	if [[ $1 == "" ]]; then echo "usage: reloadmod <module> [\"<params>\"]"; return 1; fi
+	sync
+	rmmod $1
+	modprobe $1 $2
+}
+
+# Print Hard Drive Temperature (Celsius)
+hdtemp() {
+	if [[ $1 == "" ]]; then DEVICE=/dev/sda; else DEVICE=$1; fi
+	smartctl -a $DEVICE | grep 194 | cut -d ' ' -f 37
+}
+
+# Run when a process returns with exit code != 0
+TRAPZERR() {
+    local DEFAULT_COLOR RED retcode=$?
+    BLUE=$(echotc AF 4 2>/dev/null)
+    DEFAULT_COLOR=$(echotc me 2>/dev/null)
+    echo "${BLUE}${retcode}${DEFAULT_COLOR}";
+}
+
+# This is specific to Debian (and related distributions)
+# It marks all packages on which a package build-depends as automatically installed,
+# since "aptitude build-dep" marks all packages it installs as manually installed.
+# I wrote a replacement for that, see /scripts/builddep
+undobuilddep () {
+    aptitude markauto $(apt-cache showsrc $1 | grep Build-Depends | perl -p -e 's/(?:[\[(].+?[\])]|Build-Depends:|,|\|)//g')
+}

@@ -1,0 +1,2 @@
+event=button/zoom ZOOM 00000080 00000000
+action=/etc/acpi/tp_fnspace.sh

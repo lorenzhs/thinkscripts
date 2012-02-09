@@ -1,0 +1,12 @@
+# Fan
+fanctrl() {
+    reloadmod thinkpad_acpi fan_control=1
+}
+
+setfan() {
+    if [[ $1 == "" ]]; then
+        echo "Usage: setfan <level>, where level is in 0-7, auto, disengaged, full-speed"
+        return 1;
+    fi;
+    echo "level $1" > /proc/acpi/ibm/fan
+}
