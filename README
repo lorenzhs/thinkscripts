@@ -1,6 +1,7 @@
 This is a collection of scripts and shell functions I find useful.
 I use zsh, so all functions are only tested with zsh. Maybe you're lucky and they work with bash, too. I don't know.
 
-Hereby, I publish my own work on this collection under a two-clause BSD license (see LICENSE), work of others are of course covered by the licenses their original authors chose.
+Hereby, I publish my own work on this collection under a two-clause BSD license (see LICENSE),
+works of others are of course covered by the licenses their original authors chose.
 
 If you have any suggestions, feel free to contact me at thinkscripts@4z2.de
