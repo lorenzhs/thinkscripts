@@ -18,7 +18,7 @@ fi
 TEMPDIR=`mktemp -d`
 pushd $TEMPDIR
 echo "Downloading current chrome ${CRELEASE} for ${ARCH}..."
-wget "http://dl.google.com/linux/direct/google-chrome-${CRELEASE}_current_${ARCH}.deb"
+wget "https://dl-ssl.google.com/linux/direct/google-chrome-${CRELEASE}_current_${ARCH}.deb"
 echo "Extracting..."
 # If you're not using a system with Debian package management, you might want to use ar xv and lzma -df and tar xvf instead
 dpkg -x google-chrome-${CRELEASE}_current_${ARCH}.deb .
