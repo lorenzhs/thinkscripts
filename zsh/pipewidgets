@@ -1,5 +1,5 @@
 # This depends on a zle widget by Max Mikhanosha which he posted to zsh-users
-# Get it at http://www.zsh.org/mla/users/2008/msg00708.html
+# Get it at http://www.zsh.org/mla/users/2008/msg00708.html and source it here
 
 # Define some widgets
 # C-g for grep, C-f for less

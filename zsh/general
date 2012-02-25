@@ -1,3 +1,6 @@
+# Workaround for a bug that makes my T420 reboot instead of halt
+alias halt="sync; rmmod ehci_hcd; /sbin/halt"
+
 # Reload a kernel module safely, optionally passing parameters
 # Useful to enable fan control.
 reloadmod() {
