@@ -1,2 +1,6 @@
+# This goes to /etc/acpi/events/
+# You might need to adapt the event, it is different for
+# some ThinkPad models and thinkpad_acpi versions
+# Use acpi_listen and press fn+space.
 event=button/zoom ZOOM 00000080 00000000
 action=/etc/acpi/tp_fnspace.sh
