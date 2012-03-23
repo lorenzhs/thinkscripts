@@ -22,6 +22,8 @@ wget "https://dl-ssl.google.com/linux/direct/google-chrome-${CRELEASE}_current_$
 echo "Extracting..."
 # If you're not using a system with Debian package management, you might want to use ar xv and lzma -df and tar xvf instead
 dpkg -x google-chrome-${CRELEASE}_current_${ARCH}.deb .
+echo "Backing up current libpdf.so..."
+sudo mv ${CHROMIUMPATH}/libpdf.so ${CHROMIUMPATH}/libpdf.so.old
 echo "Installing libpdf.so to ${CHROMIUMPATH}..."
 sudo install -Dm 755 ./opt/google/chrome/libpdf.so ${CHROMIUMPATH}/libpdf.so
 popd
