@@ -31,3 +31,16 @@ TRAPZERR() {
 undobuilddep () {
     aptitude markauto $(apt-cache showsrc $1 | grep Build-Depends | perl -p -e 's/(?:[\[(].+?[\])]|Build-Depends:|,|\|)//g')
 }
+
+# du fun
+duc() {
+	if [[ $1 == "" ]]; then DIR="."; else DIR=$1; fi
+	du -h --max-depth=1 $DIR
+}
+
+ducs() {
+        duc $1 | sort -h
+}
+
+# get last modified in folder
+lru() { ls -t $* 2> /dev/null | head -n 1 };

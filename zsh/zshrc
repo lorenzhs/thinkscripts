@@ -1,0 +1,98 @@
+ZSHHOMEDIR=~/.zsh
+
+# Color setup
+zmodload -ab zsh/termcap echotc
+DEFAULT_COLOR=$(echotc me 2>/dev/null)
+GREEN=$(echotc AF 2 2>/dev/null)
+RED=$(echotc AF 1 2>/dev/null)
+
+# Nice prompt
+export RPROMPT="[%B%4.%b]"
+export PROMPT="%B%T %w%#%b "
+
+# Report time
+export REPORTTIME=10
+
+export LESS=-r
+
+# Colorize grep
+(grep --help 2>/dev/null |grep -- --color) >/dev/null &&
+    alias grep='grep --color=auto'
+
+#############
+## OPTIONS ##
+#############
+
+bindkey -e
+setopt extendedglob # Extended Globbing
+setopt glob_complete
+setopt interactive_comments
+setopt complete_in_word
+setopt auto_cd
+setopt always_last_prompt
+setopt extended_history # add timestamps to history
+setopt appendhistory notify
+setopt histignorespace # a space in fron enables "incognito mode"
+unsetopt beep
+
+################
+## COMPLETION ##
+################
+
+# initialize completion system
+autoload -Uz compinit
+compinit
+
+# Completion options
+zstyle ':completion:*' completer _expand _complete _approximate
+zstyle ':completion:*:descriptions' format "${GREEN}completing %B%d%b${DEFAULT_COLOR}"    # format on completion
+zstyle ':completion:*:matches' group 'yes'                                                # separate matches into groups
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path $ZSHHOMEDIR/cache
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+zstyle ':completion:*:*:mplayer:*:urls' hidden yes
+zstyle ':completion:*:complete-extended:*' matcher 'r:|[.,_-]=* r:|=*'  # e.g. f-1.j<TAB> would complete to foo-123.jpeg
+
+#############
+## ALIASES ##
+#############
+
+# This whole section is pretty much up to you
+
+# Colorize ls
+alias ls='ls --color=auto'
+alias ll="ls -lhF"
+alias la="ls -lAFh"
+alias lsd='ls -ld *(-/DN)' # only dirs and symlinks to dirs
+alias lsa='ls -ld .*' # List only hidden files
+# go upwards
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+
+
+alias g=git
+alias d="dig +short"
+
+# LUKS
+alias lO="cryptsetup luksOpen"
+alias lC="cryptsetup luksClose"
+
+# Django's manage.py
+alias dj="python manage.py"
+
+# Simple Webserver in current dir on port 8000
+alias http="python -m SimpleHTTPServer"
+
+# You might want to source the other files here
+source $ZSHHOMEDIR/functions
+
+#############
+## CLEANUP ##
+#############
+
+# clean color environment variables
+for color in DEFAULT_COLOR GREEN RED; unset $color
