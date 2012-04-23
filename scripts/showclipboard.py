@@ -26,8 +26,8 @@ def check_output(cmdparts, text=None):
 def par(text):
     # Characters are nearly twice as high as wide, screens 1.5 times wider than high
     # So sqrt(numchars) characters per line would give you something that is nearly two times higher
-    # than wide. Making it wider by a factor of 2.2 should work out for most screens.
-    maxlen = max(15, int(2.2*math.sqrt(len(text))))
+    # than wide. Making it wider by a factor of 2.1 should work out for most screens.
+    maxlen = max(15, int(2.1*math.sqrt(len(text))))
     call = ['par', str(maxlen)]
     return check_output(call, text)[:-1]
 
