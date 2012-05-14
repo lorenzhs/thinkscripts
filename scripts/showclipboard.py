@@ -34,7 +34,7 @@ def par(text):
 def do_sc(signum, frame):
     text = check_output(['xclip', '-o'])
     text = par(text)
-    check_output(['sm', text])
+    check_output(['sm', '-'], text)
 
 signal.signal(signal.SIGUSR1, do_sc)
 
