@@ -10,6 +10,10 @@ RED=$(echotc AF 1 2>/dev/null)
 export RPROMPT="[%B%4.%b]"
 export PROMPT="%B%T %w%#%b "
 
+# Add /sbin and /usr/sbin to PATH
+if [[ -n $PATH ]]; then export PATH=$PATH:; fi
+export PATH=$PATH/sbin:/usr/sbin
+
 # Report time
 export REPORTTIME=10
 
