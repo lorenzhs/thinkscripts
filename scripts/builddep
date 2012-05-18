@@ -6,6 +6,10 @@
 # I have yet to find an easy way to install a local package and its dependencies)
 # Anyay, like this, clean removal of build-dependencies is easy-peasy.
 
+# Configure this to fit your needs
+MAINTAINERNAME="foo"
+MAINTAINERNAME="raboof@bar.baz"
+
 if [[ -z $1 ]]; then echo "Usage: builddep <package name> [<package display name>]"; return 1; fi
 
 PKG=$1
@@ -21,7 +25,7 @@ Architecture: all
 Essential: no
 $DEPS
 Installed-Size: 0
-Maintainer: Your Name <foo@bar.baz>
+Maintainer: $MAINTAINERNAME <$MAINTAINERMAIL>
 Description: This package pulls in all the dependencies for $PKGN. It does not do anything else."
 
 TMPDIR=$(mktemp -d)
@@ -32,4 +36,4 @@ echo $CONTROL > pkg/DEBIAN/control
 dpkg -b pkg $FILENAME
 mv $FILENAME $CDIR
 popd
-#rm -r $TMPDIR
+rm -r $TMPDIR
