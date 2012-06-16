@@ -1,0 +1,20 @@
+#! /bin/bash
+# Original source: https://wiki.archlinux.org/index.php/Convert_Flac_to_Mp3
+# Original license: GNU Free Documentation License 1.3 or later <http://www.gnu.org/copyleft/fdl.html>
+
+BITRATE=320
+
+find . -type f -name "*.flac" -print0 | while read -d $'\0' a
+
+do
+    OUTF=${a%.flac}.mp3
+
+    ARTIST=$(metaflac "$a" --show-tag=ARTIST | sed s/.*=//g)
+    TITLE=$(metaflac "$a" --show-tag=TITLE | sed s/.*=//g)
+    ALBUM=$(metaflac "$a" --show-tag=ALBUM | sed s/.*=//g)
+    GENRE=$(metaflac "$a" --show-tag=GENRE | sed s/.*=//g)
+    TRACK=$(metaflac "$a" --show-tag=TRACKNUMBER | sed s/.*=//g)
+    DATE=$(metaflac "$a" --show-tag=DATE | sed s/.*=//g)
+
+    flac -c -d "$a" | lame -m j -b $BITRATE -q 0 --vbr-new --noreplaygain -V 0 -s 44.1 --add-id3v2 --pad-id3v2 --ignore-tag-errors --tt "$TITLE" --tn "${TRACK:-0}" --ta "$ARTIST" --tl "$ALBUM" --ty "$DATE" --tg "${GENRE:-12}" - "$OUTF"
+done
