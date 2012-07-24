@@ -6,10 +6,6 @@ DEFAULT_COLOR=$(echotc me 2>/dev/null)
 GREEN=$(echotc AF 2 2>/dev/null)
 RED=$(echotc AF 1 2>/dev/null)
 
-# Nice prompt
-export RPROMPT="[%B%4.%b]"
-export PROMPT="%B%T %w%#%b "
-
 # Add /sbin and /usr/sbin to PATH
 if [[ -n $PATH ]]; then export PATH=$PATH:; fi
 export PATH=$PATH/sbin:/usr/sbin
@@ -93,6 +89,15 @@ alias http="python -m SimpleHTTPServer"
 
 # You might want to source the other files here
 source $ZSHHOMEDIR/functions
+
+
+############
+## PROMPT ##
+############
+
+#PROMPT='%m %B%~%b %# '
+export RPROMPT='[%B%4.%b]$(prompt_jobs)'
+export PROMPT="%B%T %w%#%b "
 
 #############
 ## CLEANUP ##
