@@ -122,7 +122,7 @@ class ImgurAlbumDownloader:
         self.images = re.findall('<img src="(http\:\/\/i\.imgur\.com\/([a-zA-Z0-9]+\.(jpg|jpeg|png|gif)))"', html)
 
         if self.output_messages or self.few_messages:
-            print "Found %d images in album" % len(self.images)
+            print "Found %d images in album, downloading" % len(self.images),
 
         # Try and create the album folder:
         albumFolder = foldername or self.album_key
@@ -134,6 +134,9 @@ class ImgurAlbumDownloader:
         for (counter, image) in enumerate(self.images, start=1):
             if self.output_messages:
                 print "Fetching Image: " + image[0]
+            elif self.few_messages:
+                sys.stdout.write( ".")
+                sys.stdout.flush()
             prefix = "%0*d-" % (digits, counter)
             path = os.path.join(albumFolder, prefix + image[1])
 
@@ -151,6 +154,8 @@ class ImgurAlbumDownloader:
         if self.output_messages:
             print ""
             print "Done!"
+        elif self.few_messages:
+            print " done"
 
 
 if __name__ == '__main__':
