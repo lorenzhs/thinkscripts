@@ -119,7 +119,8 @@ class ImgurAlbumDownloader:
         If no foldername is given, it'll use the album key from the URL.
         """
         html = self.response.read()
-        self.images = re.findall('<img src="(http\:\/\/i\.imgur\.com\/([a-zA-Z0-9]+\.(jpg|jpeg|png|gif)))"', html)
+        matches = re.findall('<img src="http\:\/\/i\.imgur\.com\/([a-zA-Z0-9]+)h\.(jpg|jpeg|png|gif)"', html)
+        self.images = [('http://i.imgur.com/%s.%s' % (img[0], img[1]), '%s.%s' % (img[0], img[1]), img[1]) for img in matches]
 
         if self.output_messages or self.few_messages:
             print "Found %d images in album, downloading" % len(self.images),
