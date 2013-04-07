@@ -1,39 +1,83 @@
-#!/bin/zsh
+#!/usr/bin/env python
+# encoding: utf-8
 # This script analyzes a debian package's description, extracts its build dependencies and
 # creates an otherwise empty package that depends on these packages in your current working
-# directory. You will have to install it manually (you will probably get lots of broken
-# dependencies since the dependencies are missing, open up aptitude and fix those manually;
-# I have yet to find an easy way to install a local package and its dependencies)
-# Anyay, like this, clean removal of build-dependencies is easy-peasy.
+# directory. This way, clean removal of build-dependencies is easy-peasy.
+# You might want to configure line 12 below
 
-# Configure this to fit your needs
-MAINTAINERNAME="foo"
-MAINTAINERNAME="raboof@bar.baz"
+from subprocess import Popen, PIPE
+import os
+import tempfile
 
-if [[ -z $1 ]]; then echo "Usage: builddep <package name> [<package display name>]"; return 1; fi
+MAINTAINER="foo <foo@bar.baz>"
 
-PKG=$1
-if [[ ! -z $2 ]]; then PKGN=$2; else PKGN=$1; fi
-DEPS=$(apt-cache showsrc $1 | /bin/grep "Build-Depends" | head -n 1 | sed 's/^Build-//' | sed 's/ \[[^\]*\]//')
-FILENAME=$PKG-deps.deb
-
-CONTROL="Package: $PKG-deps
+CONTROL="""Package: {package}-deps
 Version: 1.0
 Section: devel
 Priority: optional
-Architecture: all
+Architecture: {arch}
 Essential: no
-$DEPS
+Depends: {deps}
 Installed-Size: 0
-Maintainer: $MAINTAINERNAME <$MAINTAINERMAIL>
-Description: This package pulls in all the dependencies for $PKGN. It does not do anything else."
+Maintainer: {maintainer}
+Description: This package pulls in all the dependencies for {package}. It does not do anything else.
+"""
 
-TMPDIR=$(mktemp -d)
-CDIR=$(pwd)
-pushd $TMPDIR
-mkdir -p pkg/DEBIAN
-echo $CONTROL > pkg/DEBIAN/control
-dpkg -b pkg $FILENAME
-mv $FILENAME $CDIR
-popd
-rm -r $TMPDIR
+def getarch():
+    proc = Popen(["dpkg", "--print-architecture"],stdout=PIPE)
+    arch, _ = proc.communicate()
+    return arch.strip()
+
+def builddeps(package):
+    proc = Popen(["apt-cache", "showsrc", package],stdout=PIPE)
+    out,_ = proc.communicate()
+    deps = []
+    for line in out.split('\n'):
+        if line.startswith('Build-Depends'):
+            deps.extend(line.split(None,1)[1].split(", "))
+    return deps
+
+def filterarch(deps):
+    for dep in deps:
+        pos = dep.find('[')
+        if pos == -1:  # no architectures specified
+            yield dep
+        else:
+            package = dep[:pos-1]
+            end = dep.find(']')
+            architectures = dep[pos+1:end].split()
+            for architecture in architectures:
+                invert = False
+                if architecture.startswith('!'):
+                    architecture = architecture[1:]
+                    invert = True
+                proc = Popen(["dpkg-architecture", "-i{arch}".format(arch=architecture)])
+                status = invert - proc.wait()
+                if status == 0:
+                    yield package
+                    break
+
+def writeControlFile(package, filename):
+    deps = builddeps(package)
+    deps = ', '.join(filterarch(deps))
+    control = CONTROL.format(package=package, arch=getarch(), deps=deps, maintainer=MAINTAINER)
+    with open(filename, 'w') as output:
+        output.write(control)
+
+def createDependencyPackage(package):
+    temp = tempfile.mkdtemp()
+    path = os.sep.join([temp, "DEBIAN"])
+    os.makedirs(path)
+    controlfn = path + os.sep + "control"
+    writeControlFile(package, controlfn)
+
+    debfn = "{pkg}-deps.deb".format(pkg=package)
+    proc = Popen(["dpkg-deb", "-b", temp, debfn])
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) < 2:
+        print "Usage: {cmd} package".format(cmd=sys.argv[0])
+        sys.exit(1)
+    package = sys.argv[1]
+    createDependencyPackage(package)
