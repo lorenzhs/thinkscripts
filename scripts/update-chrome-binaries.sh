@@ -3,7 +3,7 @@
 # Adapt this if your chromium is located e.g. at /usr/lib/chromium-browser
 CHROMIUMPATH=/usr/lib/chromium
 # Choose one: unstable, beta, stable
-CRELEASE=beta
+CRELEASE=stable
 
 ARCHSTRING=$(uname -m)
 if [[ $ARCHSTRING == "x86_64" ]]; then
@@ -26,5 +26,13 @@ echo "Backing up current libpdf.so..."
 sudo mv ${CHROMIUMPATH}/libpdf.so ${CHROMIUMPATH}/libpdf.so.old
 echo "Installing libpdf.so to ${CHROMIUMPATH}..."
 sudo install -Dm 755 ./opt/google/chrome/libpdf.so ${CHROMIUMPATH}/libpdf.so
+echo "Backing up current Pepper Flash..."
+if [[ -d ${CHROMIUMPATH}/PepperFlash_old ]]; then
+	sudo rm -r ${CHROMIUMPATH}/PepperFlash_old
+fi
+sudo mv ${CHROMIUMPATH}/PepperFlash ${CHROMIUMPATH}/PepperFlash_old
+echo "Installing new Pepper Flash to ${CHROMIUMPATH}/PepperFlash..."
+sudo install -d ${CHROMIUMPATH}/PepperFlash
+sudo install -m644 ./opt/google/chrome/PepperFlash/* ${CHROMIUMPATH}/PepperFlash
 popd
 rm -r $TEMPDIR
